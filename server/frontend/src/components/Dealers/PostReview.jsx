@@ -5,6 +5,7 @@ import "../assets/style.css";
 import Header from '../Header/Header';
 
 
+
 const PostReview = () => {
   const [dealer, setDealer] = useState({});
   const [review, setReview] = useState("");
@@ -17,9 +18,15 @@ const PostReview = () => {
   let root_url = curr_url.substring(0,curr_url.indexOf("postreview"));
   let params = useParams();
   let id =params.id;
-  let dealer_url = root_url+`djangoapp/dealer/${id}`;
-  let review_url = root_url+`djangoapp/add_review`;
-  let carmodels_url = root_url+`djangoapp/get_cars`;
+  //let dealer_url = root_url+`djangoapp/dealer/${id}`;
+  //let review_url = root_url+`djangoapp/add_review`;
+  let carmodels_url = "https://d1234-8000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/djangoapp/get_cars"
+
+
+  let dealer_url = `https://d1234-3030.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/fetchdealer/${id}`
+
+  let review_url = `https://d1234-8000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/djangoapp/add_review/${id}`
+
 
   const postreview = async ()=>{
     let name = sessionStorage.getItem("firstname")+" "+sessionStorage.getItem("lastname");
@@ -56,33 +63,37 @@ const PostReview = () => {
       body: jsoninput,
   });
 
-  const json = await res.json();
-  if (json.status === 200) {
-      window.location.href = window.location.origin+"/dealer/"+id;
-  }
+  await res.json().then(something => {
+
+    window.location.href = window.location.origin+"/dealer/"+id;
+
+  });
 
   }
   const get_dealer = async ()=>{
     const res = await fetch(dealer_url, {
       method: "GET"
     });
-    const retobj = await res.json();
+    const retobj = await res.json().then(retobj => {
+
+        let dealerobjs = Array.from(retobj)
+        if(dealerobjs.length > 0)
+          setDealer(dealerobjs[0])
+
+    });
     
-    if(retobj.status === 200) {
-      let dealerobjs = Array.from(retobj.dealer)
-      if(dealerobjs.length > 0)
-        setDealer(dealerobjs[0])
-    }
+
   }
 
   const get_cars = async ()=>{
     const res = await fetch(carmodels_url, {
       method: "GET"
     });
-    const retobj = await res.json();
-    
-    let carmodelsarr = Array.from(retobj.CarModels)
-    setCarmodels(carmodelsarr)
+    const retobj = await res.json().then(retobj => {
+
+        let carmodelsarr = Array.from(retobj.CarModels)
+        setCarmodels(carmodelsarr)
+    });
   }
   useEffect(() => {
     get_dealer();

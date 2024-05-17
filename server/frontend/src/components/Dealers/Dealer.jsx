@@ -20,35 +20,40 @@ const Dealer = () => {
   let root_url = curr_url.substring(0,curr_url.indexOf("dealer"));
   let params = useParams();
   let id =params.id;
-  let dealer_url = root_url+`djangoapp/dealer/${id}`;
-  let reviews_url = root_url+`djangoapp/reviews/dealer/${id}`;
-  let post_review = root_url+`postreview/${id}`;
-  
+  //let dealer_url = root_url+`djangoapp/dealer/${id}`;
+  //let reviews_url = root_url+`djangoapp/reviews/dealer/${id}`;
+  //let post_review = root_url+`postreview/${id}`;
+  let dealer_url = `https://d1234-3030.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/fetchdealer/${id}`
+
+  let reviews_url = `https://d1234-3030.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/fetchReviews/dealer/${id}`
+
+  let post_review = `https://d1234-8000.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/postreview/${id}`
+
+
   const get_dealer = async ()=>{
     const res = await fetch(dealer_url, {
       method: "GET"
     });
-    const retobj = await res.json();
-    
-    if(retobj.status === 200) {
-      let dealerobjs = Array.from(retobj.dealer)
-      setDealer(dealerobjs[0])
-    }
+    const retobj = await res.json().then(retobj => {
+
+        let dealerobjs = Array.from(retobj)
+        setDealer(dealerobjs[0])
+    });
   }
 
   const get_reviews = async ()=>{
     const res = await fetch(reviews_url, {
       method: "GET"
     });
-    const retobj = await res.json();
-    
-    if(retobj.status === 200) {
-      if(retobj.reviews.length > 0){
-        setReviews(retobj.reviews)
-      } else {
-        setUnreviewed(true);
-      }
-    }
+    const retobj = await res.json().then(retobj => {
+
+        if(retobj.length > 0){
+            setReviews(retobj)
+          } else {
+            setUnreviewed(true);
+          }
+
+    });
   }
 
   const senti_icon = (sentiment)=>{
@@ -80,7 +85,7 @@ return(
       ):  unreviewed === true? <div>No reviews yet! </div> :
       reviews.map(review => (
         <div className='review_panel'>
-          <img src={senti_icon(review.sentiment)} className="emotion_icon" alt='Sentiment'/>
+          <img src={positive_icon} className="emotion_icon" alt='Sentiment'/>
           <div className='review'>{review.review}</div>
           <div className="reviewer">{review.name} {review.car_make} {review.car_model} {review.car_year}</div>
         </div>
