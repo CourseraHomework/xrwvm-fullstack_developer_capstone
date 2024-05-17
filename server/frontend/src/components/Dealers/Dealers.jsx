@@ -10,29 +10,41 @@ const Dealers = () => {
   let [states, setStates] = useState([])
 
   // let root_url = window.location.origin
-  let dealer_url ="/djangoapp/get_dealers";
+    //let dealer_url ="/get_dealers";
   
-  let dealer_url_by_state = "/djangoapp/get_dealers/";
+  let dealer_url = "https://d1234-3030.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/fetchdealers/";
+
+  let dealer_url_by_state = "https://d1234-3030.theiadockernext-0-labs-prod-theiak8s-4-tor01.proxy.cognitiveclass.ai/fetchdealers/";
  
   const filterDealers = async (state) => {
     dealer_url_by_state = dealer_url_by_state+state;
     const res = await fetch(dealer_url_by_state, {
       method: "GET"
     });
-    const retobj = await res.json();
-    if(retobj.status === 200) {
-      let state_dealers = Array.from(retobj.dealers)
-      setDealersList(state_dealers)
-    }
+    //const retobj = await res.json();
+
+    res.json().then(retobj => {
+
+        let state_dealers = Array.from(retobj)
+        setDealersList(state_dealers)
+    })
   }
 
   const get_dealers = async ()=>{
     const res = await fetch(dealer_url, {
       method: "GET"
     });
-    const retobj = await res.json();
-    if(retobj.status === 200) {
-      let all_dealers = Array.from(retobj.dealers)
+    
+    //const retobj = res.json();
+
+    //if(retobj.status === 200) {        
+    
+    res.json().then(retobj => {
+    //let retobj = res.
+    
+      //let all_dealers = Array.from(retobj.dealers)
+
+      let all_dealers = Array.from(retobj)
       let states = [];
       all_dealers.forEach((dealer)=>{
         states.push(dealer.state)
@@ -40,18 +52,17 @@ const Dealers = () => {
 
       setStates(Array.from(new Set(states)))
       setDealersList(all_dealers)
-    }
+    })
   }
   useEffect(() => {
-    get_dealers();
+    get_dealers();    
   },[]);  
 
 
 let isLoggedIn = sessionStorage.getItem("username") != null ? true : false;
 return(
   <div>
-      <Header/>
-
+      <Header/>    
      <table className='table'>
       <tr>
       <th>ID</th>
@@ -74,6 +85,7 @@ return(
          ):<></>
       }
       </tr>
+
      {dealersList.map(dealer => (
         <tr>
           <td>{dealer['id']}</td>
@@ -88,7 +100,7 @@ return(
           }
         </tr>
       ))}
-     </table>;
+     </table>
   </div>
 )
 }
